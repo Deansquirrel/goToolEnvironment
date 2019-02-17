@@ -17,7 +17,7 @@ func GetOsName() string {
 	return runtime.GOOS
 }
 
-//获取当前操作系统版本号
+//获取当前操作系统版本号（Win10版本号获取错误）
 func GetOsVer() (string, error) {
 	version, err := syscall.GetVersion()
 	if err != nil {
