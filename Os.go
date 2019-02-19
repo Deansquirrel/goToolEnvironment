@@ -28,6 +28,7 @@ func GetOsVer() (string, error) {
 	}
 }
 
+//获取主机名称
 func GetHostName() (string, error) {
 	return os.Hostname()
 }
