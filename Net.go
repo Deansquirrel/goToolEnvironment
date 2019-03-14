@@ -1,6 +1,7 @@
 package goToolEnvironment
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -16,7 +17,11 @@ type internetIPInfo struct {
 
 //获取公网IP
 func GetInternetAddr() (string, error) {
-	resp, err := http.Get("https://ipconfig.io/json")
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+	resp, err := client.Get("https://ipconfig.io/json")
 	if err != nil {
 		return "", err
 	}
