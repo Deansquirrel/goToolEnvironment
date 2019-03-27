@@ -17,6 +17,7 @@ type internetIPInfo struct {
 
 //获取公网IP
 func GetInternetAddr() (string, error) {
+	//TODO https://www.baidu.com/s?wd=IP
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
