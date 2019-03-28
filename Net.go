@@ -9,20 +9,76 @@ import (
 	"net/http"
 )
 
-type internetIPInfo struct {
-	Ip      string `json:"ip"`
-	Country string `json:"country"`
-	City    string `json:"city"`
+//======================================================================================================================
+//获取公网IP
+type internetIPTool struct {
+	address string
+	data    internetIPInfo
 }
 
-//获取公网IP
-func GetInternetAddr() (string, error) {
-	//TODO https://www.baidu.com/s?wd=IP
+type internetIPInfo interface {
+	GetIp() string
+}
+
+type internetIPInfo1 struct {
+	Ip string `json:"ip"`
+}
+
+func (ip *internetIPInfo1) GetIp() string {
+	return ip.Ip
+}
+
+type internetIPInfo2 struct {
+	Ip string `json:"ip_addr"`
+}
+
+func (ip *internetIPInfo2) GetIp() string {
+	return ip.Ip
+}
+
+type internetIPInfo3 struct {
+	Ip string `json:"IP"`
+}
+
+func (ip *internetIPInfo3) GetIp() string {
+	return ip.Ip
+}
+
+func GetInternetAddr() (ip string, err error) {
+	list := getInternetIPTool()
+	for _, t := range list {
+		ip, err = getInternetAddr(t)
+		if err == nil {
+			return
+		}
+	}
+	return ip, err
+}
+
+func getInternetIPTool() []*internetIPTool {
+	list := make([]*internetIPTool, 0)
+	list = append(list, &internetIPTool{
+		address: "https://ipconfig.io/json",
+		data:    &internetIPInfo1{},
+	})
+	list = append(list, &internetIPTool{
+		address: "https://ifconfig.me/all.json",
+		data:    &internetIPInfo2{},
+	})
+	list = append(list, &internetIPTool{
+		address: "https://ifconfig.minidump.info/all.json",
+		data:    &internetIPInfo3{},
+	})
+	return list
+}
+
+func getInternetAddr(tool *internetIPTool) (string, error) {
+	//https://www.baidu.com/s?wd=IP
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	client := &http.Client{Transport: tr}
-	resp, err := client.Get("https://ipconfig.io/json")
+	resp, err := client.Get(tool.address)
 	if err != nil {
 		return "", err
 	}
@@ -33,14 +89,14 @@ func GetInternetAddr() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	var result internetIPInfo
-	err = json.Unmarshal(body, &result)
+	err = json.Unmarshal(body, tool.data)
 	if err != nil {
 		return "", err
 	}
-	return result.Ip, nil
+	return tool.data.GetIp(), nil
 }
 
+//======================================================================================================================
 //获取局域网IP
 func GetIntranetAddr() (string, error) {
 	ips, err := net.InterfaceAddrs()
