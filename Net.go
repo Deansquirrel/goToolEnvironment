@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"time"
 )
 
 //======================================================================================================================
@@ -52,7 +53,7 @@ func GetInternetAddr() (ip string, err error) {
 			return
 		}
 	}
-	return ip, err
+	return
 }
 
 func getInternetIPTool() []*internetIPTool {
@@ -77,7 +78,10 @@ func getInternetAddr(tool *internetIPTool) (string, error) {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
-	client := &http.Client{Transport: tr}
+	client := &http.Client{
+		Transport: tr,
+		Timeout:   time.Second * 10,
+	}
 	resp, err := client.Get(tool.address)
 	if err != nil {
 		return "", err
