@@ -11,8 +11,16 @@ import (
 func GetClientId(clientType string) string {
 	biosSn, _ := GetBIOSSerialNumber()
 	diskSn, _ := GetDiskDriverSerialNumber()
+	cpuId, _ := GetCPUPorcessorID()
 	currPath, _ := goToolCommon.GetCurrPath()
-	return strings.ToUpper(goToolCommon.Md5([]byte(clientType + biosSn + diskSn + currPath)))
+	return strings.ToUpper(goToolCommon.Md5([]byte(clientType + biosSn + diskSn + cpuId + currPath)))
+}
+
+func GetPhysicalId() string {
+	biosSn, _ := GetBIOSSerialNumber()
+	diskSn, _ := GetDiskDriverSerialNumber()
+	cpuId, _ := GetCPUPorcessorID()
+	return strings.ToUpper(goToolCommon.Md5([]byte(biosSn + diskSn + cpuId)))
 }
 
 //获取硬盘SerialNumber
@@ -72,7 +80,7 @@ func biosSerialNumberOnWindows() (string, error) {
 }
 
 //获取CPU PorcessorID
-func CPUPorcessorID() (string, error) {
+func GetCPUPorcessorID() (string, error) {
 	switch runtime.GOOS {
 	case "windows":
 		return cpuPorcessorIDOnWindows()
