@@ -8,19 +8,40 @@ import (
 	"strings"
 )
 
-func GetClientId(clientType string) string {
-	biosSn, _ := GetBIOSSerialNumber()
-	diskSn, _ := GetDiskDriverSerialNumber()
-	cpuId, _ := GetCPUPorcessorID()
-	currPath, _ := goToolCommon.GetCurrPath()
-	return strings.ToUpper(goToolCommon.Md5([]byte(clientType + biosSn + diskSn + cpuId + currPath)))
+func GetClientId(clientType string) (string, error) {
+	biosSn, err := GetBIOSSerialNumber()
+	if err != nil {
+		return "", err
+	}
+	diskSn, err := GetDiskDriverSerialNumber()
+	if err != nil {
+		return "", err
+	}
+	cpuId, err := GetCPUPorcessorID()
+	if err != nil {
+		return "", err
+	}
+	currPath, err := goToolCommon.GetCurrPath()
+	if err != nil {
+		return "", err
+	}
+	return strings.ToUpper(goToolCommon.Md5([]byte(clientType + biosSn + diskSn + cpuId + currPath))), nil
 }
 
-func GetPhysicalId() string {
-	biosSn, _ := GetBIOSSerialNumber()
-	diskSn, _ := GetDiskDriverSerialNumber()
-	cpuId, _ := GetCPUPorcessorID()
-	return strings.ToUpper(goToolCommon.Md5([]byte(biosSn + diskSn + cpuId)))
+func GetPhysicalId() (string, error) {
+	biosSn, err := GetBIOSSerialNumber()
+	if err != nil {
+		return "", err
+	}
+	diskSn, err := GetDiskDriverSerialNumber()
+	if err != nil {
+		return "", err
+	}
+	cpuId, err := GetCPUPorcessorID()
+	if err != nil {
+		return "", err
+	}
+	return strings.ToUpper(goToolCommon.Md5([]byte(biosSn + diskSn + cpuId))), nil
 }
 
 //获取硬盘SerialNumber
