@@ -2,13 +2,21 @@ package goToolEnvironment
 
 import (
 	"errors"
+	"github.com/Deansquirrel/goToolCommon"
 	"os/exec"
 	"runtime"
 	"strings"
 )
 
+func GetClientId(clientType string) string {
+	biosSn, _ := GetBIOSSerialNumber()
+	diskSn, _ := GetDiskDriverSerialNumber()
+	currPath, _ := goToolCommon.GetCurrPath()
+	return strings.ToUpper(goToolCommon.Md5([]byte(clientType + biosSn + diskSn + currPath)))
+}
+
 //获取硬盘SerialNumber
-func DiskDriverSerialNumber() (string, error) {
+func GetDiskDriverSerialNumber() (string, error) {
 	switch runtime.GOOS {
 	case "windows":
 		return diskDriverSerialNumberOnWindows()
@@ -36,7 +44,7 @@ func diskDriverSerialNumberOnWindows() (string, error) {
 }
 
 //获取硬盘SerialNumber
-func BIOSSerialNumber() (string, error) {
+func GetBIOSSerialNumber() (string, error) {
 	switch runtime.GOOS {
 	case "windows":
 		return biosSerialNumberOnWindows()
