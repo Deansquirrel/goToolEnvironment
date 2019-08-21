@@ -9,23 +9,40 @@ import (
 )
 
 func GetClientId(clientType string) (string, error) {
+	var biosFlag, diskFlag, cpuFlag bool
+	var err error
 	biosSn, err := GetBIOSSerialNumber()
 	if err != nil {
-		return "", err
+		biosFlag = true
 	}
 	diskSn, err := GetDiskDriverSerialNumber()
 	if err != nil {
-		return "", err
+		diskFlag = true
 	}
 	cpuId, err := GetCPUPorcessorID()
 	if err != nil {
-		return "", err
+		cpuFlag = true
 	}
 	currPath, err := goToolCommon.GetCurrPath()
 	if err != nil {
 		return "", err
 	}
-	return strings.ToUpper(goToolCommon.Md5([]byte(clientType + biosSn + diskSn + cpuId + currPath))), nil
+	if biosFlag && diskFlag && cpuFlag {
+		return "", errors.New("key factor err")
+	}
+	strKey := ""
+	strKey = strKey + clientType
+	if !biosFlag {
+		strKey = strKey + biosSn
+	}
+	if !diskFlag {
+		strKey = strKey + diskSn
+	}
+	if !cpuFlag {
+		strKey = strKey + cpuId
+	}
+	strKey = strKey + currPath
+	return strings.ToUpper(goToolCommon.Md5([]byte(strKey))), nil
 }
 
 func GetPhysicalId() (string, error) {
